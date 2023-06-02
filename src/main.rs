@@ -74,35 +74,43 @@ fn main() -> Result<()> {
     let itf = SpiInterface::new(spi).with_nss(pin);
     let mut mfrc522 = Mfrc522::new(itf).init()?;
 
-    let vers = mfrc522.version()?;
+    // let vers = mfrc522.version()?;
 
-    println!("VERSION: 0x{:x}", vers);
+    // println!("VERSION: 0x{:x}", vers);
 
-    assert!(vers == 0x91 || vers == 0x92);
+    // assert!(vers == 0x91 || vers == 0x92);
+
 
     loop {
         const CARD_UID: [u8; 4] = [34, 246, 178, 171];
         const TAG_UID: [u8; 4] = [128, 170, 179, 76];
 
-        if let Ok(atqa) = mfrc522.reqa() {
-            if let Ok(uid) = mfrc522.select(&atqa) {
-                println!("UID: {:?}", uid.as_bytes());
+        println!("Requesting card...");
+        let reqa = mfrc522.reqa();
 
-                if uid.as_bytes() == CARD_UID {
-                    led.off();
-                    println!("CARD");
-                } else if uid.as_bytes() == TAG_UID {
-                    led.on();
-                    println!("TAG");
+        match reqa {
+            Ok(atqa) => {
+                println!("Card detected");
+                if let Ok(uid) = mfrc522.select(&atqa) {
+                    println!("UID: {:?}", uid.as_bytes());
+
+                    if uid.as_bytes() == CARD_UID {
+                        led.off();
+                        println!("CARD");
+                    } else if uid.as_bytes() == TAG_UID {
+                        led.on();
+                        println!("TAG");
+                    }
+
+                    handle_authenticate(&mut mfrc522, &uid, |m| {
+                        let data = m.mf_read(1)?;
+                        println!("read {:?}", data);
+                        Ok(())
+                    })
+                    .ok();
                 }
-
-                handle_authenticate(&mut mfrc522, &uid, |m| {
-                    let data = m.mf_read(1)?;
-                    println!("read {:?}", data);
-                    Ok(())
-                })
-                .ok();
-            }
+            },
+            Err(e) => println!("Error: {:?}", e),
         }
 
         delay.delay_ms(1000u32);
@@ -118,6 +126,8 @@ where
     F: FnOnce(&mut Mfrc522<COMM, Initialized>) -> Result<()>,
     E: std::fmt::Debug + std::marker::Sync + std::marker::Send + 'static,
 {
+    println!("Authenticating...");
+
     // Use *default* key, this should work on new/empty cards
     let key = [0xFF; 6];
     if mfrc522.mf_authenticate(uid, 1, &key).is_ok() {
