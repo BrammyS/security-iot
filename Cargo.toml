@@ -9,4 +9,4 @@ edition = "2021"
 anyhow = "1.0.71"
 embedded-hal = "0.2.7"
 linux-embedded-hal = "0.3.2"
-mfrc522 = "0.6.0"
+mfrc522 = { version = "0.6.0", features = ["std"] }
