@@ -6,3 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.71"
+embedded-hal = "0.2.7"
+linux-embedded-hal = "0.3.2"
+mfrc522 = "0.6.0"
