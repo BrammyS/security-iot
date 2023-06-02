@@ -74,46 +74,69 @@ fn main() -> Result<()> {
     let itf = SpiInterface::new(spi).with_nss(pin);
     let mut mfrc522 = Mfrc522::new(itf).init()?;
 
-    // let vers = mfrc522.version()?;
+    let vers = mfrc522.version()?;
 
-    // println!("VERSION: 0x{:x}", vers);
+    println!("VERSION: 0x{:x}", vers);
 
-    // assert!(vers == 0x91 || vers == 0x92);
+    assert!(vers == 0x91 || vers == 0x92);
 
 
     loop {
         const CARD_UID: [u8; 4] = [34, 246, 178, 171];
         const TAG_UID: [u8; 4] = [128, 170, 179, 76];
 
-        println!("Requesting card...");
         let reqa = mfrc522.reqa();
 
-        match reqa {
-            Ok(atqa) => {
-                println!("Card detected");
-                if let Ok(uid) = mfrc522.select(&atqa) {
-                    println!("UID: {:?}", uid.as_bytes());
+        // match reqa {
+        //     Ok(atqa) => {
+        //         println!("Card detected");
+        //         if let Ok(uid) = mfrc522.select(&atqa) {
+        //             println!("UID: {:?}", uid.as_bytes());
 
-                    if uid.as_bytes() == CARD_UID {
-                        led.off();
-                        println!("CARD");
-                    } else if uid.as_bytes() == TAG_UID {
-                        led.on();
-                        println!("TAG");
-                    }
+        //             if uid.as_bytes() == CARD_UID {
+        //                 led.off();
+        //                 println!("CARD");
+        //             } else if uid.as_bytes() == TAG_UID {
+        //                 led.on();
+        //                 println!("TAG");
+        //             }
 
-                    handle_authenticate(&mut mfrc522, &uid, |m| {
-                        let data = m.mf_read(1)?;
-                        println!("read {:?}", data);
-                        Ok(())
-                    })
-                    .ok();
+        //             handle_authenticate(&mut mfrc522, &uid, |m| {
+        //                 let data = m.mf_read(1)?;
+        //                 println!("read {:?}", data);
+        //                 Ok(())
+        //             })
+        //             .ok();
+        //         }
+        //     },
+        //     Err(e) => println!("Error: {:?}", e),
+        // }
+
+        if let Ok(atqa) = reqa {
+            println!("Card detected");
+            if let Ok(uid) = mfrc522.select(&atqa) {
+                println!("UID: {:?}", uid.as_bytes());
+
+                if uid.as_bytes() == CARD_UID {
+                    led.off();
+                    println!("CARD");
+                } else if uid.as_bytes() == TAG_UID {
+                    led.on();
+                    println!("TAG");
                 }
-            },
-            Err(e) => println!("Error: {:?}", e),
+
+                handle_authenticate(&mut mfrc522, &uid, |m| {
+                    println!("read {:?}", m.mf_read(0)?);
+                    println!("read {:?}", m.mf_read(1)?);
+                    println!("read {:?}", m.mf_read(2)?);
+                    println!("read {:?}", m.mf_read(3)?);
+                    Ok(())
+                })
+                .ok();
+            }
         }
 
-        delay.delay_ms(1000u32);
+        // delay.delay_ms(1000u32);
     }
 }
 
