@@ -11,7 +11,6 @@
 //! - GPIO11 = SCLK (SCK)
 //! - GPIO22 = NSS  (SDA)
 
-use embedded_hal;
 use linux_embedded_hal as hal;
 
 use std::fs::File;
@@ -19,8 +18,6 @@ use std::io::Write;
 
 use anyhow::Result;
 use embedded_hal::blocking::delay::DelayMs;
-use embedded_hal::blocking::spi::{Transfer as SpiTransfer, Write as SpiWrite};
-use embedded_hal::digital::v2::OutputPin;
 use hal::spidev::{SpiModeFlags, SpidevOptions};
 use hal::sysfs_gpio::Direction;
 use hal::{Delay, Pin, Spidev};
@@ -91,10 +88,10 @@ fn main() -> Result<()> {
             if let Ok(uid) = mfrc522.select(&atqa) {
                 println!("UID: {:?}", uid.as_bytes());
 
-                if uid.as_bytes() == &CARD_UID {
+                if uid.as_bytes() == CARD_UID {
                     led.off();
                     println!("CARD");
-                } else if uid.as_bytes() == &TAG_UID {
+                } else if uid.as_bytes() == TAG_UID {
                     led.on();
                     println!("TAG");
                 }
