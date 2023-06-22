@@ -15,6 +15,10 @@ Install the following extensions:
 Press `Control Shift P` and run the following command in VS code: `Dev Containers: Reopen in Container`.
 This will open the project in a docker container with all the required tools installed.
 
+## Wiring
+The following wiring was used:  
+![image](https://github.com/BrammyS/security-iot/assets/35614609/877df60f-16ff-41b2-a254-0bc6587e9329)
+
 <!-- CONTRIBUTING -->
 ## Contributing
 
