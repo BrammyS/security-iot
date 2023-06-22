@@ -1,22 +1,6 @@
-//! [Raspberry Pi 4 demo](https://gitlab.com/jspngh/rfid-rs/-/blob/master/examples/rpi.rs)
-//! This example makes use the `std` feature
-//! and `anyhow` dependency to make error handling more ergonomic.
-//!
-//! # Connections
-//!
-//! - 3V3    = VCC
-//! - GND    = GND
-//! - GPIO9  = MISO
-//! - GPIO10 = MOSI
-//! - GPIO11 = SCLK (SCK)
-//! - GPIO22 = NSS  (SDA)
-
 mod models;
 
 use linux_embedded_hal as hal;
-
-use std::fs::File;
-use std::io::Write;
 
 use anyhow::Result;
 use embedded_hal::blocking::delay::DelayMs;
@@ -27,18 +11,6 @@ use mfrc522::comm::{eh02::spi::SpiInterface, Interface};
 use mfrc522::{Initialized, Mfrc522};
 
 use security_iot::models::Led;
-
-
-// NOTE this requires tweaking permissions and configuring LED0
-//
-// ```
-// $ echo gpio | sudo tee /sys/class/leds/led0/trigger
-// $ sudo chown root:gpio /sys/class/leds/led0/brightness
-// $ sudo chmod 770 /sys/class/leds/led0/brightness
-// ```
-//
-// Alternatively you can omit the LED and comment out the contents of the `on` and `off` methods
-
 
 fn main() -> Result<()> {
     let mut led = Led;
