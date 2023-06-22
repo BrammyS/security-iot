@@ -11,6 +11,8 @@
 //! - GPIO11 = SCLK (SCK)
 //! - GPIO22 = NSS  (SDA)
 
+mod models;
+
 use linux_embedded_hal as hal;
 
 use std::fs::File;
@@ -24,6 +26,9 @@ use hal::{Delay, Pin, Spidev};
 use mfrc522::comm::{eh02::spi::SpiInterface, Interface};
 use mfrc522::{Initialized, Mfrc522};
 
+use security_iot::models::Led;
+
+
 // NOTE this requires tweaking permissions and configuring LED0
 //
 // ```
@@ -33,23 +38,7 @@ use mfrc522::{Initialized, Mfrc522};
 // ```
 //
 // Alternatively you can omit the LED and comment out the contents of the `on` and `off` methods
-pub struct Led;
 
-impl Led {
-    fn on(&mut self) {
-        File::create("/sys/class/leds/led0/brightness")
-            .unwrap()
-            .write_all(b"1\n")
-            .unwrap();
-    }
-
-    fn off(&mut self) {
-        File::create("/sys/class/leds/led0/brightness")
-            .unwrap()
-            .write_all(b"0\n")
-            .unwrap();
-    }
-}
 
 fn main() -> Result<()> {
     let mut led = Led;
