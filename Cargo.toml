@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.71"
-embedded-hal = "0.2.7"
+embedded-hal = "1.0.0"
 linux-embedded-hal = "0.3.2"
 mfrc522 = { version = "0.6.0", features = ["std"] }
